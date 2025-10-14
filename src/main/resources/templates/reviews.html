@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Analizador de Reviews — Spring AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+<div class="max-w-4xl mx-auto p-6">
+    <header class="mb-6">
+        <h1 class="text-2xl font-semibold">Analizador de Reviews — Spring AI</h1>
+        <p class="text-sm text-slate-600">
+            Envía una review en texto libre o pega el JSON de Google Play para analizar sentimiento, severidad y acciones.
+        </p>
+    </header>
+
+    <!-- FILA DE FORMULARIOS -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Formulario: Texto libre -->
+        <section>
+            <h2 class="text-base font-semibold mb-2">Texto libre</h2>
+            <form class="bg-white rounded-2xl shadow p-4 space-y-3"
+                  hx-post="/ui/analyze"
+                  hx-target="#results"
+                  hx-swap="afterbegin"
+                  hx-indicator="#loading-free"
+                  hx-on::after-request="this.reset()">
+                <label for="review" class="block text-sm font-medium text-slate-700">Review</label>
+                <textarea id="review" name="review" required rows="6" maxlength="4000"
+                          class="w-full rounded-xl border border-slate-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          placeholder="Ej: Desde la última actualización no puedo iniciar sesión..."></textarea>
+
+                <div class="flex items-center gap-3">
+                    <button type="submit"
+                            class="inline-flex items-center rounded-xl px-4 py-2 bg-indigo-600 text-white font-medium hover:bg-indigo-700">
+                        Analizar
+                    </button>
+                    <span id="loading-free" class="hidden text-sm text-slate-500">Analizando…</span>
+                </div>
+            </form>
+        </section>
+
+        <!-- Formulario: JSON de Google Play -->
+        <section>
+            <h2 class="text-base font-semibold mb-2">JSON Google Play</h2>
+            <form class="bg-white rounded-2xl shadow p-4 space-y-3"
+                  hx-post="/ui/analyze-google"
+                  hx-target="#results"
+                  hx-swap="afterbegin"
+                  hx-indicator="#loading-google"
+                  hx-on::after-request="">
+                <label for="reviewJson" class="block text-sm font-medium text-slate-700">Pegue aquí el JSON</label>
+                <textarea id="reviewJson" name="reviewJson" required rows="10"
+                          class="w-full font-mono text-sm rounded-xl border border-slate-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          placeholder='{
+  "text": "La app se cierra al abrir...",
+  "starRating": 1,
+  "appVersionName": "12.3.0",
+  "androidOsVersion": 34,
+  "thumbsUpCount": 42
+}'></textarea>
+
+                <div class="flex items-center gap-3">
+                    <button type="submit"
+                            class="inline-flex items-center rounded-xl px-4 py-2 bg-emerald-600 text-white font-medium hover:bg-emerald-700">
+                        Analizar JSON
+                    </button>
+                    <span id="loading-google" class="hidden text-sm text-slate-500">Analizando JSON…</span>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <!-- LISTA DE RESULTADOS -->
+    <section id="results" class="mt-8 space-y-4">
+        <!-- Aquí HTMX irá PREPENDIENDO las cards -->
+    </section>
+</div>
+</body>
+</html>
