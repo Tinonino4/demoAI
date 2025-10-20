@@ -73,6 +73,29 @@
                 </div>
             </form>
         </section>
+
+        <!-- Formulario: Clasificación estructurada -->
+        <section class="md:col-span-2">
+            <h2 class="text-base font-semibold mb-2">Clasificación estructurada (esquema)</h2>
+            <form class="bg-white rounded-2xl shadow p-4 space-y-3"
+                  hx-post="/ui/analyze-structured"
+                  hx-target="#results"
+                  hx-swap="afterbegin"
+                  hx-indicator="#loading-structured"
+                  hx-on::after-request="this.reset()">
+                <label for="review-structured" class="block text-sm font-medium text-slate-700">Review</label>
+                <textarea id="review-structured" name="review" required rows="4" maxlength="4000"
+                          class="w-full rounded-xl border border-slate-300 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          placeholder="Ej: Desde la última actualización no puedo entrar con huella..."></textarea>
+                <div class="flex items-center gap-3">
+                    <button type="submit"
+                            class="inline-flex items-center rounded-xl px-4 py-2 bg-purple-600 text-white font-medium hover:bg-purple-700">
+                        Clasificar (esquema)
+                    </button>
+                    <span id="loading-structured" class="hidden text-sm text-slate-500">Clasificando…</span>
+                </div>
+            </form>
+        </section>
     </div>
 
     <!-- LISTA DE RESULTADOS -->

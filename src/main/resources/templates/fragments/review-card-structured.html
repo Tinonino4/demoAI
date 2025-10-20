@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="card" class="bg-white rounded-2xl shadow p-4">
+    <div class="flex items-start justify-between">
+        <div>
+            <h3 class="text-lg font-semibold">Clasificación (Esquema)</h3>
+            <p class="text-sm text-slate-500" th:text="${#dates.createNow()}">Fecha y hora</p>
+        </div>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 text-white"
+              th:text="${structured.sentiment}">negativo</span>
+    </div>
+
+    <div class="mt-3 border border-slate-200 rounded-xl p-3 bg-slate-50">
+        <p class="text-sm text-slate-700">
+            <span class="font-medium">Review:</span>
+            <span th:text="${originalReview}">...</span>
+        </p>
+    </div>
+
+    <div class="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-slate-700">
+        <div><span class="font-semibold">category:</span> <span th:text="${structured.category}">login</span></div>
+        <div><span class="font-semibold">subcategory:</span> <span th:text="${structured.subcategory}">biometria</span></div>
+        <div><span class="font-semibold">journey_stage:</span> <span th:text="${structured.journeyStage}">uso_diario</span></div>
+        <div><span class="font-semibold">platform:</span> <span th:text="${structured.platform}">android</span></div>
+        <div><span class="font-semibold">urgency:</span> <span th:text="${structured.urgency}">4</span></div>
+        <div><span class="font-semibold">impact_scope:</span> <span th:text="${structured.impactScope}">segmentado</span></div>
+        <div><span class="font-semibold">app_component:</span> <span th:text="${structured.appComponent}">biometria</span></div>
+        <div><span class="font-semibold">is_crash:</span> <span th:text="${structured.crash}">false</span></div>
+        <div><span class="font-semibold">is_fraud_risk:</span> <span th:text="${structured.fraudRisk}">false</span></div>
+        <div><span class="font-semibold">is_blocker:</span> <span th:text="${structured.blocker}">true</span></div>
+        <div class="col-span-2 md:col-span-3">
+            <span class="font-semibold">duplicates_hint:</span> <span th:text="${structured.duplicatesHint}">...</span>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <p class="text-sm text-slate-700">
+            <span class="font-semibold">summary:</span> <span th:text="${structured.summary}">...</span>
+        </p>
+    </div>
+
+    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-slate-700">
+        <div><span class="font-semibold">next_best_action:</span> <span th:text="${structured.nextBestAction}">abrir_bug</span></div>
+        <div><span class="font-semibold">owner_squad:</span> <span th:text="${structured.ownerSquad}">login_kdc</span></div>
+    </div>
+
+    <div class="mt-3">
+        <p class="text-sm font-medium text-slate-700 mb-1">evidences:</p>
+        <ul class="list-disc list-inside space-y-1">
+            <li class="text-sm text-slate-700" th:each="e : ${structured.evidences}" th:text="${e}">evidence</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

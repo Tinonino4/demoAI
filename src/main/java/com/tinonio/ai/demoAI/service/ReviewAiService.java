@@ -3,7 +3,9 @@ package com.tinonio.ai.demoAI.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tinonio.ai.demoAI.exception.ValidationException;
 import com.tinonio.ai.demoAI.model.AnalysisResponse;
+import com.tinonio.ai.demoAI.model.ClassificationResponse;
 import com.tinonio.ai.demoAI.model.GooglePlayReview;
+import com.tinonio.ai.demoAI.prompts.StructuredTemplate;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -20,19 +22,14 @@ public class ReviewAiService {
     }
 
     private static final String SYSTEM_INSTRUCTIONS = """
-    Eres un analista de experiencia de cliente para una app bancaria.
-    Lee la review del usuario y responde **exclusivamente** en JSON siguiendo este esquema:
-    {
-    "sentiment": "POSITIVE|NEUTRAL|NEGATIVE",
-    "summary": "string",
-    "severity": "LOW|MEDIUM|HIGH|CRITICAL",
-    "recommendedActions": ["string", ...]
-    }
-    Reglas:
-    - Si el sentimiento no es NEGATIVE, recommendedActions puede ser una lista vacía.
-    - No añadas texto fuera del JSON ni explicaciones.
-    - El resumen debe ser breve y factual.
-    - La severidad refleja el impacto en el usuario y el negocio.
+        Eres un clasificador experto de reseñas de una app bancaria.\s
+        Objetivo: transformar una reseña libre en un JSON ESTRICTO que siga el esquema dado.
+        REGLAS:
+        - No alucines: si un campo no aparece, infiérelo solo si es evidente, si no marca "desconocida" o null.
+        - "urgency": 5 si impide operar (no login, no transferir), 4 si rompe funciones clave intermitentes, 3 si degrada la experiencia pero hay workaround, 2 si menor, 1 si cosmético.
+        - "sentiment": según tono general, ignora ironías salvo evidencia.
+        - "impact_scope": "masivo" si el texto sugiere que “muchos”/“todos” o tras actualización general; "segmentado" si parece afectar a un dispositivo/SO/versión; "aislado" si personal.
+        - Salida: SOLO JSON válido, sin comentarios, sin texto extra.
     """;
 
     public AnalysisResponse analyze(String reviewText) {
@@ -121,6 +118,30 @@ public class ReviewAiService {
                 && (aiResult.getSeverity() == AnalysisResponse.Severity.HIGH
                 || aiResult.getSeverity() == AnalysisResponse.Severity.CRITICAL);
         aiResult.setEscalated(shouldEscalate);
+    }
+
+    public ClassificationResponse classifyStructured(String reviewText) {
+        var system = new SystemMessage("Eres un analista CX bancario. Sigue estrictamente las instrucciones.");
+        var user = new UserMessage(StructuredTemplate.TEMPLATE.replace("{{review_text}}", reviewText));
+        var prompt = new Prompt(system, user);
+
+        String raw = chatClient.prompt(prompt).call().content();
+
+        ClassificationResponse dto;
+        try {
+            dto = mapper.readValue(raw, ClassificationResponse.class);
+        } catch (Exception e) {
+            throw new ValidationException("Salida del modelo no cumple el esquema tipado.");
+        }
+
+        // Validaciones mínimas extra (ejemplo)
+        if (dto.getEvidences() == null || dto.getEvidences().isEmpty()) {
+            throw new ValidationException("Faltan evidences.");
+        }
+        if (dto.getUrgency() == null || dto.getUrgency() < 1) {
+            throw new ValidationException("Urgency inválida.");
+        }
+        return dto;
     }
 
 

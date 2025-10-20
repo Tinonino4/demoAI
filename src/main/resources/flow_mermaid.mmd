@@ -1,0 +1,9 @@
+flowchart LR
+    A[Fuente reviews: Google Play, App Store, Form] -->|Kafka topic reviews.raw| B[Enriquecedor: normaliza y anonimiza PII]
+    B -->|Kafka reviews.clean| C[Clasificador LLM - Spring AI]
+    C -->|JSON tipado| D[(Postgres)]
+    D -->|Embeddings| E[(PGVector)]
+    E --> F[RAG ligero: glosario y release notes]
+    F --> C
+    D --> G[Dashboards y BI]
+    C -->|Tickets| H[Jira o ServiceNow]

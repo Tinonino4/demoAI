@@ -33,4 +33,6 @@ public class ReviewController {
     public AnalysisResponse analyzeGoogle(@RequestBody GooglePlayReview payload) {
         return aiService.analyzeGoogleReview(payload);
     }
+
+
 }

@@ -12,7 +12,7 @@ public class AiConfig {
     ChatClient chatClient(ChatModel model, JsonGuardAdvisor jsonGuardAdvisor) {
         return ChatClient
                 .builder(model)
-                .defaultAdvisors(jsonGuardAdvisor)
+                //.defaultAdvisors(jsonGuardAdvisor)
                 .build();
     }
 }

@@ -58,4 +58,12 @@ public class ReviewWebController {
             return "fragments/error-card :: card";
         }
     }
+
+    @PostMapping("/analyze-structured")
+    public String analyzeStructured(@RequestParam("review") String reviewText, Model model) {
+        var out = aiService.classifyStructured(reviewText);
+        model.addAttribute("structured", out);
+        model.addAttribute("originalReview", reviewText);
+        return "fragments/review-card-structured :: card";
+    }
 }
